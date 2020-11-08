@@ -26,7 +26,6 @@ def buildExpression(expressionInReversePolishNotation: str):
         try:
             if symbol == "*":
                 currentArguments = [expressionStack.pop()]
-                # expressionStack.append(MyExpression(symbol, currentArguments))
             elif symbol == "+" or symbol == ".":
                 currentArguments = [expressionStack.pop(), expressionStack.pop()]
                 currentArguments.reverse()
