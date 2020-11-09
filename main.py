@@ -64,7 +64,6 @@ def findLongestPrefixForExpression(word: str, expression: MyExpression):
                 if canAddMoreToTheLeft[i]:
                     resultsFromRightSide, canAddMoreToTheRight = findLongestPrefixForExpression(word[results[i] - len(word):],
                                                                                                 expression.arguments[1])
-                    # results += resultsFromRightSide
                     for j in range(len(resultsFromRightSide)):
                         newResults.append(results[i] + resultsFromRightSide[j])
                         canAddMore.append(canAddMoreToTheRight[j])
