@@ -43,28 +43,41 @@ def gotBadData():
 
 
 def findLongestPrefixForExpression(word: str, expression: MyExpression):
-    result = 0
-    canAddMore = True
+    results = [0]
+    canAddMore = [len(word) - 1 > 0]
     if isinstance(expression, MyExpression):
         if expression.operation == "+":
-            result1, addToFirst = findLongestPrefixForExpression(word, expression.arguments[0])
-            result2, addToSecond = findLongestPrefixForExpression(word, expression.arguments[1])
-            result = max(result1, result2)
-            canAddMore = addToFirst or addToSecond
+            results1, addToFirst = findLongestPrefixForExpression(word, expression.arguments[0])
+            results2, addToSecond = findLongestPrefixForExpression(word, expression.arguments[1])
+            results = results1 + results2
+            canAddMore = addToFirst + addToSecond
         elif expression.operation == "*":
-            # TODO fill * operation
-            findLongestPrefixForExpression(word, MyExpression(".", [expression.arguments[0], expression]))
+            results, canAddMore = findLongestPrefixForExpression(word, MyExpression(".", [expression.arguments[0], expression]))
+            results.append(0)
+            canAddMore.append(True)
         elif expression.operation == ".":
-            result, canAddMore = findLongestPrefixForExpression(word, expression.arguments[0])
-            if canAddMore:
-                resultFromRightSide, canAddMore = findLongestPrefixForExpression(word[result - len(word):],
-                                                                                 expression.arguments[1])
-                result += resultFromRightSide
-
+            results, canAddMoreToTheLeft = findLongestPrefixForExpression(word, expression.arguments[0])
+            newResults = []
+            canAddMore = []
+            for i in range(len(results)):
+                if canAddMoreToTheLeft[i]:
+                    resultsFromRightSide, canAddMoreToTheRight = findLongestPrefixForExpression(word[results[i] - len(word):],
+                                                                                                expression.arguments[1])
+                    # results += resultsFromRightSide
+                    for j in range(len(resultsFromRightSide)):
+                        newResults.append(results[i] + resultsFromRightSide[j])
+                        canAddMore.append(canAddMoreToTheRight[j])
+                else:
+                    newResults.append(results[i])
+                    canAddMore.append(canAddMoreToTheLeft[i])
+            results = newResults
+            canAddMore = canAddMore
     if isinstance(expression, str):
         if word[0] == expression:
-            result = 1
-    return result, canAddMore
+            results = [1]
+        else:
+            canAddMore = [False]
+    return results, canAddMore
 
 
 def findLongestPrefixForRegular(word: str, regularExpression: str):
