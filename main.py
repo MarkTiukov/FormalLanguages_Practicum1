@@ -84,7 +84,7 @@ def findLongestPrefixForRegular(word: str, regularExpression: str):
     expression = buildExpression(regularExpression)
     if expression is badDataString:
         return badDataString
-    return findLongestPrefixForExpression(word, expression)
+    return max(findLongestPrefixForExpression(word, expression)[0])
 
 
 def readData():
