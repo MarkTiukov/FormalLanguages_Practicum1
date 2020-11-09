@@ -2,6 +2,7 @@ from collections import deque
 
 operations = {".", "+", "*"}
 badDataString = "ERROR"
+epsilon = "1"
 
 
 class MyExpression:
@@ -63,7 +64,6 @@ def findLongestPrefixForExpression(word: str, expression: MyExpression):
                 if canAddMoreToTheLeft[i]:
                     resultsFromRightSide, canAddMoreToTheRight = findLongestPrefixForExpression(word[results[i] - len(word):],
                                                                                                 expression.arguments[1])
-                    # results += resultsFromRightSide
                     for j in range(len(resultsFromRightSide)):
                         newResults.append(results[i] + resultsFromRightSide[j])
                         canAddMore.append(canAddMoreToTheRight[j])
@@ -75,6 +75,8 @@ def findLongestPrefixForExpression(word: str, expression: MyExpression):
     if isinstance(expression, str):
         if word[0] == expression:
             results = [1]
+        elif expression == epsilon:
+            results = [0]
         else:
             canAddMore = [False]
     return results, canAddMore
