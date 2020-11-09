@@ -53,7 +53,7 @@ def findLongestPrefixForExpression(word: str, expression: MyExpression):
             canAddMore = addToFirst or addToSecond
         elif expression.operation == "*":
             # TODO fill * operation
-            return 0, False
+            findLongestPrefixForExpression(word, MyExpression(".", [expression.arguments[0], expression]))
         elif expression.operation == ".":
             result, canAddMore = findLongestPrefixForExpression(word, expression.arguments[0])
             if canAddMore:
