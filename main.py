@@ -43,42 +43,65 @@ def gotBadData():
     return badDataString
 
 
-def findLongestPrefixForExpression(word: str, expression: MyExpression):
+def processCommandPlus(word: str, expression: MyExpression):
+    results1, addToFirst = findLongestPrefixForExpression(word, expression.arguments[0])
+    results2, addToSecond = findLongestPrefixForExpression(word, expression.arguments[1])
+    return results1 + results2, addToFirst + addToSecond
+
+
+def processCommandStart(word: str, expression: MyExpression):
+    results, canAddMore = findLongestPrefixForExpression(word, MyExpression(".", [expression.arguments[0], expression]))
+    results.append(0)
+    canAddMore.append(True)
+    return results, canAddMore
+
+
+def processCommandConcatenation(word: str, expression: MyExpression):
+    results, canAddMoreToTheLeft = findLongestPrefixForExpression(word, expression.arguments[0])
+    newResults = []
+    canAddMore = []
+    for i in range(len(results)):
+        if canAddMoreToTheLeft[i]:
+            resultsFromRightSide, canAddMoreToTheRight = findLongestPrefixForExpression(word[results[i] - len(word):],
+                                                                                        expression.arguments[1])
+            for j in range(len(resultsFromRightSide)):
+                newResults.append(results[i] + resultsFromRightSide[j])
+                canAddMore.append(canAddMoreToTheRight[j])
+        else:
+            newResults.append(results[i])
+            canAddMore.append(canAddMoreToTheLeft[i])
+    return newResults, canAddMore
+
+
+def processCommand(word: str, expression: MyExpression):
+    if expression.operation == "+":
+        results, canAddMore = processCommandPlus(word, expression)
+    elif expression.operation == "*":
+        results, canAddMore = processCommandStart(word, expression)
+    elif expression.operation == ".":
+        results, canAddMore = processCommandConcatenation(word, expression)
+    return results, canAddMore
+
+
+def processSymbol(word: str, expression: str):
+    results = [0]
+    canAddMore = [len(word) - 1 > 0]
+    if word[0] == expression:
+        results = [1]
+    elif expression == epsilon:
+        results = [0]
+    else:
+        canAddMore = [False]
+    return results, canAddMore
+
+
+def findLongestPrefixForExpression(word: str, expression):
     results = [0]
     canAddMore = [len(word) - 1 > 0]
     if isinstance(expression, MyExpression):
-        if expression.operation == "+":
-            results1, addToFirst = findLongestPrefixForExpression(word, expression.arguments[0])
-            results2, addToSecond = findLongestPrefixForExpression(word, expression.arguments[1])
-            results = results1 + results2
-            canAddMore = addToFirst + addToSecond
-        elif expression.operation == "*":
-            results, canAddMore = findLongestPrefixForExpression(word, MyExpression(".", [expression.arguments[0], expression]))
-            results.append(0)
-            canAddMore.append(True)
-        elif expression.operation == ".":
-            results, canAddMoreToTheLeft = findLongestPrefixForExpression(word, expression.arguments[0])
-            newResults = []
-            canAddMore = []
-            for i in range(len(results)):
-                if canAddMoreToTheLeft[i]:
-                    resultsFromRightSide, canAddMoreToTheRight = findLongestPrefixForExpression(word[results[i] - len(word):],
-                                                                                                expression.arguments[1])
-                    for j in range(len(resultsFromRightSide)):
-                        newResults.append(results[i] + resultsFromRightSide[j])
-                        canAddMore.append(canAddMoreToTheRight[j])
-                else:
-                    newResults.append(results[i])
-                    canAddMore.append(canAddMoreToTheLeft[i])
-            results = newResults
-            canAddMore = canAddMore
+        results, canAddMore = processCommand(word, expression)
     if isinstance(expression, str):
-        if word[0] == expression:
-            results = [1]
-        elif expression == epsilon:
-            results = [0]
-        else:
-            canAddMore = [False]
+        results, canAddMore = processSymbol(word, expression)
     return results, canAddMore
 
 
