@@ -49,7 +49,7 @@ def processCommandPlus(word: str, expression: MyExpression):
     return results1 + results2, addToFirst + addToSecond
 
 
-def processCommandStart(word: str, expression: MyExpression):
+def processCommandStar(word: str, expression: MyExpression):
     results, canAddMore = findLongestPrefixForExpression(word, MyExpression(".", [expression.arguments[0], expression]))
     results.append(0)
     canAddMore.append(True)
@@ -77,7 +77,7 @@ def processCommand(word: str, expression: MyExpression):
     if expression.operation == "+":
         results, canAddMore = processCommandPlus(word, expression)
     elif expression.operation == "*":
-        results, canAddMore = processCommandStart(word, expression)
+        results, canAddMore = processCommandStar(word, expression)
     elif expression.operation == ".":
         results, canAddMore = processCommandConcatenation(word, expression)
     return results, canAddMore
